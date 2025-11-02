@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sweet Interactive Slides</title>
+  <style>
+    :root{
+      --accent:#ff8fb1;
+      --accent-2:#ffd6e0;
+      --bg-dark:#1b1420;
+      --card:#271825;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial}
+
+    body{
+      background-color:var(--bg-dark);
+      background-image:
+        radial-gradient(1200px 600px at 10% 20%, rgba(255,140,177,0.08), transparent 10%),
+        radial-gradient(900px 400px at 90% 80%, rgba(255,214,224,0.06), transparent 8%),
+        radial-gradient(600px 300px at 50% 40%, rgba(255,200,220,0.04), transparent 6%),
+        linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.5));
+      color:#f8eef4;
+      display:flex;align-items:center;justify-content:center;padding:30px;
+      background-attachment:fixed;
+    }
+
+    .canvas{width:960px;max-width:96%;height:700px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:18px;box-shadow:0 20px 50px rgba(5,3,8,0.7);overflow:hidden;position:relative;padding:18px}
+
+    .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .28s,transform .28s;}
+    .hidden{opacity:0;pointer-events:none;transform:scale(.98)}
+
+    .paper{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02);width:88%;max-width:640px}
+
+    h1{margin:0;font-size:34px;line-height:1.05;color:var(--accent-2);text-align:center;text-shadow:0 6px 30px rgba(0,0,0,0.6)}
+    h1[contenteditable], .lead[contenteditable], .letter[contenteditable]{outline:none}
+    .lead{margin-top:12px;font-size:16px;color:rgba(255,255,255,0.9);text-align:center}
+
+    .img-drop{width:100%;height:360px;border-radius:10px;border:2px dashed rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;position:relative;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.003));overflow:hidden}
+    .img-drop img{max-width:100%;max-height:100%;cursor:grab;position:absolute}
+
+    .letter{min-height:260px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.05));border-radius:8px;font-size:16px;line-height:1.6;color:#ffeef6}
+
+    .nav{position:absolute;left:12px;bottom:12px;width:calc(100% - 24px);display:flex;gap:8px}
+    .nav button{flex:1;padding:8px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:white;cursor:pointer}
+
+    .badge{position:absolute;left:12px;top:12px;background:linear-gradient(180deg,var(--accent),var(--accent-2));padding:6px 10px;border-radius:999px;font-weight:600;color:#2e0018}
+
+.description {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #ffdce9;
+  text-shadow: 0 0 6px #ff9ac6;
+  background: rgba(255, 182, 193, 0.1);
+  padding: 15px;
+  border-radius: 15px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+#slide2 {
+  background: radial-gradient(circle at center, #3b1c32 20%, #2a0f23 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.photo-section {
+  text-align: center;
+}
+
+.main-photo {
+  width: 350px;
+  height: auto;
+  border-radius: 25px;
+  box-shadow: 0 0 30px rgba(255, 150, 190, 0.6);
+  transition: transform 0.6s ease, box-shadow 0.6s ease;
+}
+
+.main-photo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 50px rgba(255, 200, 220, 0.8);
+}
+
+.description {
+  margin-top: 25px;
+  font-size: 20px;
+  color: #ffdce9;
+  text-shadow: 0 0 6px #ff9ac6;
+  background: rgba(255, 182, 193, 0.1);
+  padding: 15px 25px;
+  border-radius: 15px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#slide4 {
+  background: radial-gradient(circle at center, #3b1c32 20%, #2a0f23 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.collage-container {
+  position: relative;
+  text-align: center;
+}
+
+.collage-preview {
+  background: rgba(255, 200, 220, 0.1);
+  padding: 40px 60px;
+  border: 2px dashed #ffb6d9;
+  border-radius: 20px;
+  cursor: pointer;
+  color: #ff9fc2;
+  font-size: 22px;
+  box-shadow: 0 0 15px rgba(255, 150, 180, 0.4);
+  transition: transform 0.3s;
+}
+
+.collage-preview:hover {
+  transform: scale(1.05);
+}
+
+.floating-images {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.floating-images img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(255, 150, 190, 0.7);
+  animation: floatUp 4s infinite ease-in-out alternate;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.8s ease;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  50% { transform: translateY(-20px) rotate(2deg) scale(1.05); }
+  100% { transform: translateY(0) rotate(-2deg) scale(1); }
+}
+
+.floating-images.show img {
+  opacity: 1;
+  transform: scale(1);
+}
+
+
+#slide5 {
+  position: relative;
+  background: radial-gradient(circle at center, #3b1c32 20%, #2a0f23 100%);
+  overflow: hidden;
+}
+
+.heart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.big-heart {
+  position: relative;
+  width: 200px;
+  height: 180px;
+  background: #ff7aa2;
+  transform: rotate(-45deg);
+  animation: pulse 1.5s infinite ease-in-out;
+  box-shadow: 0 0 40px 10px rgba(255, 150, 190, 0.6);
+}
+
+/* heart lobes */
+.big-heart::before,
+.big-heart::after {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 180px;
+  background: #ff7aa2;
+  border-radius: 50%;
+  box-shadow: 0 0 40px 10px rgba(255, 150, 190, 0.6);
+}
+
+.big-heart::before {
+  top: -100px;
+  left: 0;
+}
+
+.big-heart::after {
+  left: 100px;
+  top: 0;
+}
+
+/* heartbeat animation */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1) rotate(-45deg);
+    box-shadow: 0 0 40px 10px rgba(255, 150, 190, 0.6);
+  }
+  50% {
+    transform: scale(1.2) rotate(-45deg);
+    box-shadow: 0 0 60px 20px rgba(255, 170, 200, 0.8);
+  }
+}
+
+#slide5 {
+  position: relative;
+  background: radial-gradient(circle at center, #3b1c32 20%, #2a0f23 100%);
+  overflow: hidden;
+}
+
+.heart-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Big glowing heart */
+.big-heart {
+  position: relative;
+  width: 200px;
+  height: 180px;
+  background: #ff7aa2;
+  transform: rotate(-45deg);
+  animation: pulse 1.5s infinite ease-in-out;
+  box-shadow: 0 0 40px 10px rgba(255, 150, 190, 0.6);
+}
+
+.big-heart::before,
+.big-heart::after {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 180px;
+  background: #ff7aa2;
+  border-radius: 50%;
+  box-shadow: 0 0 40px 10px rgba(255, 150, 190, 0.6);
+}
+
+.big-heart::before {
+  top: -100px;
+  left: 0;
+}
+
+.big-heart::after {
+  left: 100px;
+  top: 0;
+}
+
+/* Text styling */
+.love-text {
+  font-size: 90px;
+  font-family: 'Pacifico', cursive;
+  color: #ffb6d9;
+  text-shadow: 0 0 25px #ff7aa2, 0 0 50px #ff4d8b;
+  margin-top: 50px;
+  animation: glow 2s infinite alternate;
+  letter-spacing: 5px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1) rotate(-45deg);
+    box-shadow: 0 0 40px 10px rgba(255, 150, 190, 0.6);
+  }
+  50% {
+    transform: scale(1.2) rotate(-45deg);
+    box-shadow: 0 0 60px 20px rgba(255, 170, 200, 0.8);
+  }
+}
+
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 25px #ff7aa2, 0 0 50px #ff4d8b;
+  }
+  100% {
+    text-shadow: 0 0 40px #ffb6d9, 0 0 80px #ff7aa2;
+  }
+}
+
+
+.collage-preview {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.floating-images.hidden {
+  display: none;
+}
+
+.collage-description {
+  margin-bottom: 30px;
+  font-size: 22px;
+  color: #ffdce9;
+  text-shadow: 0 0 6px #ff9ac6;
+  background: rgba(255, 182, 193, 0.1);
+  padding: 15px 25px;
+  border-radius: 15px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  font-style: italic;
+  box-shadow: 0 0 20px rgba(255, 150, 190, 0.3);
+}
+
+  </style>
+</head>
+<body>
+  <div class="canvas" id="canvas">
+    <div class="badge">Sweet</div>
+
+    <!-- Slide 1 -->
+    <section class="slide" id="slide1">
+      <div class="paper">
+        <h1 id="title" contenteditable>HAPPY MONTHSARY!</h1>
+        <div class="lead" contenteditable>A way of my appreciation to you.(As an IT student)</div>
+      </div>
+    </section>
+
+    <!-- Slide 2 -->
+    <section class="slide hidden" id="slide2">
+      <div class="photo-section">
+    <img src="C:\Users\andre\Downloads\1e24cb8c-c7f9-4e07-ad42-e1745839d4a4.jpg" alt="Your photo" class="main-photo">
+    <div class="description">
+      <div class="description" contenteditable="true">
+    <p>Our first ever picture>_<</p>
+  </div>
+    </section>
+
+    <!-- Slide 3 -->
+    <section class="slide hidden" id="slide3">
+      <div class="paper">
+        <div class="letter" contenteditable>Dear love,<br><br>Good day my love, I hope you  doing well. I made this letter for our 38th mindshare hehe. First of all, thank you for being there for me when I need you most, your presence made me feel safe and happy at the same time. Whenever I feel tired, you were there to be my rest, whenever I feel sad you were there to comfort me, and whenever I'm mad at someone you were there to let me calm down. Second thing is that you always make me feel loved, I can feel that you always make time for me, willing to do anything just to help me with something and sometimes you even sacrifice your sleep just to wait from me. Lastly, thank you for everything, I mean literally everything you've done for me I appreciate everything you're doing for me. Iloveyousomuch my bebi, this is my way of thanking you, again Happy Monthsary!!<br><br>With love,<br>— Ur Husband</div>
+      </div>
+    </section>
+
+    <!-- Slide 4 -->
+    <section class="slide hidden" id="slide4">
+      <div class="collage-container">
+<div class="collage-description" contenteditable="true">
+  <p>Remember these photos? >_< </p>
+</div>
+    <div class="collage-preview" id="collagePreview">
+      <div class="lead">Click to reveal our memories 💫</div>
+    </div>
+    <div class="floating-images hidden" id="floatingImages">
+      <img src="C:\Users\andre\OneDrive\Desktop\mem1.jpg" alt="">
+      <img src="C:\Users\andre\OneDrive\Desktop\mem2.jpg" alt="">
+      <img src="C:\Users\andre\OneDrive\Desktop\mem3.jpg" alt="">
+      <img src="C:\Users\andre\OneDrive\Desktop\mem4.jpg" alt="">
+      <img src="C:\Users\andre\OneDrive\Desktop\mem5.jpg" alt="">
+      <img src="C:\Users\andre\OneDrive\Desktop\mem6.jpg" alt="">
+    </div>
+      </div>
+    </section>
+
+    <!-- Slide 5 -->
+    <section class="slide hidden" id="slide5">
+      <div class="heart-container">
+    <div class="big-heart"></div>
+     <h1 class="love-text">I LOVE YOU</h1>
+      </div>
+    </section>
+
+    <div class="nav">
+      <button id="prevBtn">◀ Prev</button>
+      <button id="nextBtn">Next ▶</button>
+    </div>
+  </div>
+
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+  let idx = 0;
+  function show(i){
+    slides.forEach((s,n)=>s.classList.toggle('hidden',n!==i));
+    idx=i;
+  }
+  document.getElementById('nextBtn').onclick=()=>show((idx+1)%slides.length);
+  document.getElementById('prevBtn').onclick=()=>show((idx-1+slides.length)%slides.length);
+
+  // collage section fix
+  const collagePreview = document.getElementById('collagePreview');
+  const floatingImages = document.getElementById('floatingImages');
+
+  collagePreview.addEventListener('click', () => {
+    console.log('clicked!');
+    collagePreview.classList.add('hidden');
+    floatingImages.classList.remove('hidden');
+    setTimeout(() => floatingImages.classList.add('show'), 100);
+  });
+
+  // initialize first slide
+  show(0);
+  </script>
+</body>
+</html>
